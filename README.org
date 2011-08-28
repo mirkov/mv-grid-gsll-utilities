@@ -1,0 +1,19 @@
+My utilities on top of =mv-grid= and =mv-gsll=
+
+
+=mv-grid+gsll= provides utilities that use the combined facilities of
+=mv-grid=, =grid=, and =gsll=.  The utilities improve the user
+interface and add traceability to data analysis.
+
+
+* Facilities
+
+  - Tabular data including look-up and interpolation
+
+* History and future
+  =mv-grid= and =mv-gsll= provide utilities on top of Liam Healy's
+  =gsd= and =gsll= packages.  These two packages specialize on their
+  parent libraries only.
+
+  In the future my utilities will be either submitted to Liam's new
+  =Antik= package, or live on top of it or its subsystems.
