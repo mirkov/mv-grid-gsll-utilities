@@ -1,5 +1,5 @@
 ;; Mirko Vukovic
-;; Time-stamp: <2011-08-28 15:47:23 tabular-data.lisp>
+;; Time-stamp: <2012-07-11 17:15:46 tabular-data.lisp>
 ;; 
 ;; Copyright 2011 Mirko Vukovic
 ;; Distributed under the terms of the GNU General Public License
@@ -21,7 +21,12 @@
 
 ;; tabular-data class stores multi-dimensional arrays and provides
 ;; facilities fore retreival and interpolation
-
+(export '(tabular-data
+	  table-data table-column data-documentation table-rank
+	  table-dimensions table-rows table-columns table-pages
+	  table-elements table-column-names
+	  make-table
+	  init-table-interp interp-table))
 
 (defclass tabular-data ()
   ((source :reader data-source
@@ -30,9 +35,9 @@
 procedure")
    (data :initarg :data
 	 :reader table-data
-	 :documentation "The data itself.  Must be a lisp or grid 
-vector or array")
-   (documentation :initarg data-documentation
+	 :documentation "The data itself.  Must be a native lisp array
+or grid vector or array")
+   (documentation :initarg :data-documentation
 		  :initform nil
 		  :reader data-documentation
 		  :documentation "String describing the data")
@@ -91,7 +96,7 @@ is done separately, since there may be multiple ways to do that"
 		      finally (return p)))
     (when data-source (setf source data-source))
     (when data-documentation
-      (setf (slot-value self data-documentation) data-documentation))
+      (setf (slot-value self 'documentation) data-documentation))
     (setf rows (first dimensions))
     (when (> rank 1) (setf columns (second dimensions)))
     (when (> rank 2) (setf pages (third dimensions)))))
@@ -109,7 +114,7 @@ is done separately, since there may be multiple ways to do that"
 		  (make-table
 		   (mv-grid:read-grid '(nil 7) stream :csv :eof-value :eof
 				      :type 'double-float)
-		   file))))
+		   file "foo"))))
     table))
 
 (define-test make-tabular-data
@@ -127,18 +132,18 @@ is done separately, since there may be multiple ways to do that"
 
 
 
-(defmethod init-spline-interp ((self tabular-data)
+(defmethod init-table-interp ((self tabular-data)
 			       &optional (interpolation-type
 					  gsll:+cubic-spline-interpolation+))
   (setf (slot-value self 'interpolation-data)
 	(make-array 8))
   (let ((x (grid:column (table-data self) 0)))
-    (dotimes (i (1- (table-columns self)))
+    (dotimes (i (table-columns self))
       (setf (aref (slot-value self 'interpolation-data) i)
 	    (gsll:make-spline interpolation-type
 			      x (grid:column (table-data self) i))))))
 
-(defmethod spline-interp ((self tabular-data) x-value column-index)
+(defmethod interp-table ((self tabular-data) x-value column-index)
   (gsll:evaluate (aref
 		  (slot-value self 'interpolation-data)
 		  column-index)
@@ -147,14 +152,14 @@ is done separately, since there may be multiple ways to do that"
 (defmethod table-column ((self tabular-data) column-index)
   (grid:column (table-data self) column-index))
 
-(define-test table-spline-interpolation
+(define-test table-interpolation
   ;; I test the table spline interpolation by interpolating a column
   ;; against itself.
   (let* ((table (make-test-table)))
-    (init-spline-interp table)
+    (init-table-interp table)
     (assert-numerical-equal
      1.01d0
-     (spline-interp table 1.01d0 0))))
+     (interp-table table 1.01d0 0))))
 
 
   
