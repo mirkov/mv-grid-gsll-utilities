@@ -8,6 +8,6 @@
 	    :depends-on ("setup")
 	    :components ((:file "tabular-data"))))
   :depends-on (:alexandria
-	       :grid
 	       :gsll
+	       :antik
 	       :mv-grid-utils))

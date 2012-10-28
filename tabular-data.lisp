@@ -1,5 +1,5 @@
 ;; Mirko Vukovic
-;; Time-stamp: <2012-07-11 17:15:46 tabular-data.lisp>
+;; Time-stamp: <2012-10-27 22:54:36Eastern Daylight Time tabular-data.lisp>
 ;; 
 ;; Copyright 2011 Mirko Vukovic
 ;; Distributed under the terms of the GNU General Public License
@@ -89,7 +89,7 @@ is done separately, since there may be multiple ways to do that"
   (with-slots (source data rank dimensions rows columns pages elements) self
     (setf data  data
 	  dimensions  (grid:dimensions data)
-	  rank (grid:grid-rank data)
+	  rank (grid:rank data)
 	  elements (loop for d in dimensions
 		      with p = 1
 		      do (setf p (* p d))
@@ -98,7 +98,7 @@ is done separately, since there may be multiple ways to do that"
     (when data-documentation
       (setf (slot-value self 'documentation) data-documentation))
     (setf rows (first dimensions))
-    (when (> rank 1) (setf columns (second dimensions)))
+    (when (> rank 1) (setf columns (cl:second dimensions)))
     (when (> rank 2) (setf pages (third dimensions)))))
 
   
@@ -107,9 +107,16 @@ is done separately, since there may be multiple ways to do that"
 		 :data-documentation documentation))
 
 (defun make-test-table ()
-  (let* ((file "test.dat")
+  (let* ((file
+	  (let ((path
+		 (merge-pathnames
+		  "test.dat"
+		  (asdf:system-source-directory "mv-grid+gsll-utilities"))))
+	    (assert path ()
+		    "Did not find test file ~a" "test.dat")
+	    path))
 	 (csv-parser:*field-separator* #\Space)
-	 (*array-type* 'grid::foreign-array)
+	 (grid:*default-grid-type* 'grid::foreign-array)
 	 (table (with-input-from-file (stream file)
 		  (make-table
 		   (mv-grid:read-grid '(nil 7) stream :csv :eof-value :eof
@@ -118,14 +125,14 @@ is done separately, since there may be multiple ways to do that"
     table))
 
 (define-test make-tabular-data
-  (let ((table (make-test-table))
-	(assert-equal '(82 7) (table-dimensions table))
-	(assert-equal 2 (table-rank table))
-	(assert-equal (* 82 7) (table-elements table))
-	(assert-equal "test.dat" (data-source table))
-	(assert-equal 82 (table-rows table))
-	(assert-equal 7 (table-columns table))
-	(assert-true (not (table-pages table))))))
+  (let ((table (make-test-table)))
+    (assert-equal '(82 7) (table-dimensions table) "dimensions")
+    (assert-equal 2 (table-rank table) "rank")
+    (assert-equal (* 82 7) (table-elements table) "element count")
+    (assert-true  (probe-file (data-source table)) "Source file exists")
+    (assert-equal 82 (table-rows table) "rows")
+    (assert-equal 7 (table-columns table) "columns")
+    (assert-true (not (table-pages table)) "pages")))
 
   
 		

@@ -1,5 +1,5 @@
 ;; Mirko Vukovic
-;; Time-stamp: <2011-08-28 13:27:15 mv-grid+gsll-package-def.lisp>
+;; Time-stamp: <2012-10-27 22:45:40Eastern Daylight Time mv-grid+gsll-package-def.lisp>
 ;; 
 ;; Copyright 2011 Mirko Vukovic
 ;; Distributed under the terms of the GNU General Public License
@@ -19,7 +19,9 @@
 
 (defpackage :mv-grid+gsll
   (:nicknames :mv-grid+gsll)
-  (:use :cl :grid :mv-grid :gsll :lisp-unit)
-  (:shadow :gsll :row :column :norm)
+  (:use :cl :mv-grid :lisp-unit)
+  (:shadow :lisp-unit :norm)
   (:import-from :alexandria :with-input-from-file)
   (:documentation "foo"))
+
+(antik:make-user-package :mv-grid+gsll)

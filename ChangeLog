@@ -1,0 +1,14 @@
+2012-10-27  Mirko Vukovic  <mirko.vukovic@us.tel.com>
+
+	* tabular-data.lisp (initialize-instance): Using grid:rank instead
+	of grid-rank
+	(initialize-instance): Using cl:second instead of plain second
+	(make-test-table): Using *default-grid-type* instead of obsolete
+	*array-type*
+	(make-test-table): Built test file path to include library
+	directory, and modified test to test for the existance of the
+	table's source file
+
+	* mv-grid+gsll-utilities.asd (mv-grid+gsll-utilities): Changed
+	dependency from gsll and grid to antik
+
